@@ -1,5 +1,5 @@
 export default class GameStateEntity {
-    #game = null
+    _game = null
     #id = ""
     #path = ""
     #description = ""
@@ -16,7 +16,7 @@ export default class GameStateEntity {
         if (!GameStateEntity.isValidId(id)) {
             throw new Error(`Invalid id ${id}`)
         }
-        this.#game = game
+        this._game = game
         this.#id = id
     }
 

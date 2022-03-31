@@ -1,4 +1,5 @@
 import GameLoop from "../../gameloop/game-loop.js"
+import GameCalculationOperation from "../../gameloop/game-calculation-operation.js"
 
 window.onload = () => {
     const game = new GameLoop()
@@ -15,6 +16,12 @@ window.onload = () => {
     o2a.setDerivative(0.5)
     o2b.setDerivative(o2a)
 
+    const oc = game.state.createCalculatedValue("Total", "total", o1b)
+    oc.addOperation(GameCalculationOperation.ADD, o2b)
+
+    const og = game.state.createValue("Supertotal", "super-total", 0)
+    og.setDerivative(oc)
+
     game.setPostStepFunction(() => {
         document.body.innerText = `
         ${game.time.toFixed(2)}
@@ -22,6 +29,8 @@ window.onload = () => {
         ${game.state.getContainer("object1").getValue("size", true).debugInfo()}
         ${o2a.debugInfo()}
         ${o2b.debugInfo()}
+        ${oc.debugInfo()}
+        ${og.debugInfo()}
         `
     })
 

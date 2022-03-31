@@ -1,20 +1,36 @@
 import GameStateEntity from "./game-state-entity.js"
 import GameValue from "./game-value.js"
+import GameCalculatedValue from "./game-calculated-value.js"
 
 export default class GameValueContainer extends GameStateEntity {
     values = {}
     containers = {}
     isRoot = false
 
-
     createValue(description = "", id = GameStateEntity.getNewId, defaultValue = 0) {
         if (this.values[id]) {
             throw new Error(`Value with id ${id} already exists`)
         }
 
-        const value = new GameValue(this, id)
+        const value = new GameValue(this._game, id)
         value.setDescription(description)
         value.setValue(defaultValue)
+        if (!this.isRoot)
+            value.setPath(this.getFullId())
+
+        this.values[id] = value
+
+        return value
+    }
+
+    createCalculatedValue(description = "", id = GameStateEntity.getNewId, base = 0) {
+        if (this.values[id]) {
+            throw new Error(`Value with id ${id} already exists`)
+        }
+
+        const value = new GameCalculatedValue(this._game, id)
+        value.setDescription(description)
+        value.setBase(base)
         if (!this.isRoot)
             value.setPath(this.getFullId())
 
@@ -28,7 +44,7 @@ export default class GameValueContainer extends GameStateEntity {
             throw new Error(`Container with id ${id} already exists`)
         }
 
-        const container = new GameValueContainer(this, id)
+        const container = new GameValueContainer(this._game, id)
         container.setDescription(description)
         if (!this.isRoot)
             container.setPath(this.getFullId())
@@ -78,7 +94,7 @@ export default class GameValueContainer extends GameStateEntity {
 
     prepareAdvance(time) {
         for (const value of Object.values(this.values)) {
-            value.prepareAdvance(time)
+            value.prepareAdvance?.(time)
         }
 
         for (const container of Object.values(this.containers)) {
@@ -88,7 +104,7 @@ export default class GameValueContainer extends GameStateEntity {
 
     finalizeAdvance() {
         for (const value of Object.values(this.values)) {
-            value.finalizeAdvance()
+            value.finalizeAdvance?.()
         }
 
         for (const container of Object.values(this.containers)) {

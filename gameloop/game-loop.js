@@ -69,8 +69,9 @@ export default class GameLoop {
     #processStep(stepTime) {
         this.preStepFunction?.(stepTime)
 
+        this.state.prepareAdvance(stepTime)
         this.time += stepTime
-        this.state.advance(stepTime)
+        this.state.finalizeAdvance()
 
         this.postStepFunction?.(stepTime)
     }
